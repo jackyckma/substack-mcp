@@ -13,6 +13,11 @@ tags and comments, and upload images — 27 tools exposed through one MCP server
 > web session. Treat the session token exactly like a password: keep it local, never commit it, and
 > never include it or a complete Cookie header in a bug report.
 
+> [!NOTE]
+> This fork adds an optional Streamable HTTP transport for remote deployment (e.g. Zeabur), so the
+> server can be reached from claude.ai web/mobile instead of only a local stdio MCP client. See
+> [docs/REMOTE_DEPLOY.md](docs/REMOTE_DEPLOY.md). Local stdio use below is unchanged from upstream.
+
 ## Quick start
 
 The fastest installation uses [Node.js 22 or newer](https://nodejs.org/) and `npx`.
