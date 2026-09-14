@@ -287,7 +287,7 @@ export const tools = {
   },
 };
 
-export function createServer() {
+export function createServer(options = {}) {
   // McpServer derives tools/list from what is registered here and validates every call
   // against the tool's zod schema before the handler runs, so there is no hand-written
   // list_tools handler, dispatch table or JSON Schema conversion to keep in sync.
@@ -295,7 +295,16 @@ export function createServer() {
   // `logging`, which it never implemented.
   const server = new McpServer({name: "Substack MCP", version});
 
-  for (const [name, {description, schema, handler}] of Object.entries(tools)) {
+  // `allowedTools`, when passed, narrows what gets registered — e.g. a remote deployment
+  // exposing only a content-publishing subset instead of the full 27 tools. Omitting it
+  // (the default, and every existing caller) registers everything, unchanged from before
+  // this option existed.
+  const {allowedTools} = options;
+  const entries = allowedTools
+    ? Object.entries(tools).filter(([name]) => allowedTools.has(name))
+    : Object.entries(tools);
+
+  for (const [name, {description, schema, handler}] of entries) {
     server.registerTool(name, {description, inputSchema: schema}, async (args) => {
       const startedAt = Date.now();
       logger.info("tool.call.start", {tool: name, args});
