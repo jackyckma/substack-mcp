@@ -11,6 +11,7 @@ import {getPublicationStatsSchema, getPublicationStatsHandler} from "./tools/get
 import {getAnalyticsSchema, getAnalyticsHandler} from "./tools/get_analytics.js";
 import {getPostStatsSchema, getPostStatsHandler} from "./tools/get_post_stats.js";
 import {updateDraftSchema, updateDraftHandler} from "./tools/update_draft.js";
+import {setPostTranslationSchema, setPostTranslationHandler} from "./tools/set_post_translation.js";
 import {deleteDraftSchema, deleteDraftHandler} from "./tools/delete_draft.js";
 import {publishDraftSchema, publishDraftHandler} from "./tools/publish_draft.js";
 import {getPublicationSchema, getPublicationHandler} from "./tools/get_publication.js";
@@ -112,6 +113,15 @@ export const tools = {
       "audience and email settings. Take the id from list_posts or create_draft_post.",
     schema: getDraftSchema,
     handler: getDraftHandler,
+  },
+  set_post_translation: {
+    description:
+      "Add or replace a language edition ('translation') on a draft with your own content, " +
+      "instead of Substack's automatic AI translation. Uses the same document format as " +
+      "set_post_body for the body. Reverse-engineered and undocumented by Substack — verified " +
+      "live only for the 'zh-hant' language code.",
+    schema: setPostTranslationSchema,
+    handler: setPostTranslationHandler,
   },
   update_draft: {
     description:
