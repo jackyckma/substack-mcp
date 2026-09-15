@@ -297,6 +297,36 @@ actually landed, which differs from the one passed when it was re-hosted.
 </details>
 
 <details>
+<summary><strong>set_post_translation</strong> - Add or replace a language edition on a draft with your own content</summary>
+
+> **Reverse-engineered and undocumented by Substack** — not from an official API, verified live only
+> for the `zh-hant` (Traditional Chinese) language code. This is this fork's addition, not part of
+> upstream.
+
+Substack's "Additional post languages" editor feature stores every language edition of a post as one
+entry in a `translations` array on the *same* draft — not a separate post. Opening the Languages menu
+in the editor and picking a language always produces an AI-generated translation first; this tool
+exists to write your own translation in its place, e.g. for migrating an existing bilingual archive.
+
+**Inputs**:
+- `draft_id` (number): the id from `list_posts` or `create_draft_post`
+- `language` (string): the Substack language code for this edition, e.g. `zh-hant`
+- `title` (string, optional): omit to keep the existing translation's title, or fall back to the draft's own main title
+- `subtitle` (string, optional): omit to keep the existing translation's subtitle, or fall back to the draft's own main subtitle
+- `body` (object): a Substack document, in the same format as `set_post_body`
+- `source_language` (string, optional): the main draft's language code, e.g. `en`. Only used the first time a language edition is created, to seed Substack's own translation step before this tool overwrites it. Defaults to `en`.
+
+**Returns**: `{draft_id, language, nodes, was_new, translations_count}`. `was_new` says whether the
+language slot had to be created; `translations_count` is how many language editions the draft now
+has in total, so a caller can confirm an existing language was not accidentally dropped.
+
+The draft is read before writing: Substack's PUT genuinely merges *top-level* fields (verified — a
+PUT carrying only `draft_title` leaves the body untouched), but `translations` is a plain array, not
+merged by language, so writing it without first reading the existing entries would silently drop any
+other language edition already on the draft.
+</details>
+
+<details>
 <summary><strong>publish_draft</strong> - Publish a draft</summary>
 
 **Inputs**:
