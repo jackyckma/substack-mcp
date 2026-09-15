@@ -226,6 +226,23 @@ export default class SubstackApi {
   }
 
   /**
+   * Creates a language edition ("translation") slot on a draft. Reverse-engineered from the
+   * dashboard's own network calls, 2026-09-15 — undocumented. The response includes an
+   * AI-generated first draft in that language, which setPostTranslation immediately overwrites
+   * with caller-supplied content rather than using. `source_language` is the language code of the
+   * draft's own main content (e.g. 'en'), sent as `sourceLanguage` in the body; `language` is the
+   * target and is part of the path, not the body.
+   */
+  async createDraftTranslation(draft_id, language, {source_language = 'en'} = {}) {
+    return this.request({
+      method: 'POST',
+      path: `/drafts/${draft_id}/translations/${language}`,
+      body: {sourceLanguage: source_language},
+      referer: '/publish/post',
+    });
+  }
+
+  /**
    * Deletes a draft. The endpoint is shared with published posts — the same DELETE removes one —
    * which is why `delete_draft` refuses an `is_published` target rather than exposing that reach.
    */
