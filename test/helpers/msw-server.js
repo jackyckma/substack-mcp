@@ -468,6 +468,18 @@ export const DRAFT_DETAIL_RESPONSE = {
   slug: 'a-draft',
 };
 
+// Shaped after a real `POST /drafts/:id/translations/:language` response, verified live 2026-09-15:
+// the same keys as a `translations[]` entry on the draft itself, plus an AI-generated draft_body
+// that set_post_translation immediately overwrites.
+export const DRAFT_TRANSLATION_RESPONSE = {
+  post_id: 167712345,
+  language: 'zh-hant',
+  draft_title: 'A draft',
+  draft_subtitle: 'Its subtitle',
+  draft_body: '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"AI placeholder"}]}]}',
+  from_author: true,
+};
+
 export const DASHBOARD_SUMMARY_RESPONSE = {
   subscribers: 2025,
   subscribersLast30Days: 77,
@@ -617,6 +629,13 @@ export function createMswServer() {
     return http.put(`${DRAFTS_URL}/:id`, async ({request, params}) => {
       await record(request);
       return responder(params.id);
+    });
+  }
+
+  function draftTranslationCreateHandler(responder) {
+    return http.post(`${DRAFTS_URL}/:id/translations/:language`, async ({request, params}) => {
+      await record(request);
+      return responder(params.id, params.language);
     });
   }
 
@@ -818,6 +837,10 @@ export function createMswServer() {
     postsHandler(() => HttpResponse.json(POSTS_RESPONSE, {status: 200})),
     draftDetailHandler(() => HttpResponse.json(DRAFT_DETAIL_RESPONSE, {status: 200})),
     draftUpdateHandler(() => HttpResponse.json(DRAFT_RESPONSE, {status: 200})),
+    draftTranslationCreateHandler((id, language) => HttpResponse.json(
+      {...DRAFT_TRANSLATION_RESPONSE, post_id: Number(id), language},
+      {status: 200}
+    )),
     draftDeleteHandler(() => HttpResponse.json({}, {status: 200})),
     publishDraftHandler(() => HttpResponse.json(PUBLISHED_POST_RESPONSE, {status: 200})),
     publicationHandler(() => HttpResponse.json(PUBLICATION_RESPONSE, {status: 200})),
@@ -871,6 +894,7 @@ export function createMswServer() {
     postsHandler,
     draftDetailHandler,
     draftUpdateHandler,
+    draftTranslationCreateHandler,
     draftDeleteHandler,
     publishDraftHandler,
     publicationHandler,
